@@ -1,0 +1,36 @@
+from fastapi import Depends, HTTPException, status
+
+from app.utils import AppModel
+
+from ..service import Service, get_service
+from ..adapters.jwt_service import JWTData
+from .dependencies import parse_jwt_user_data
+from . import router
+
+
+class UpdateUserDataRequest(AppModel):
+    phone: str
+    name: str
+    city: str
+
+
+@router.patch("/auth/users/me", status_code=status.HTTP_200_OK)
+def update_user_data(
+    data: UpdateUserDataRequest,
+    jwt_data: JWTData = Depends(parse_jwt_user_data),
+    svc: Service = Depends(get_service),
+) -> None:
+    user = svc.repository.get_user_by_id(jwt_data.user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    updated_user = {
+        "phone": data.phone,
+        "name": data.name,
+        "city": data.city,
+    }
+
+    svc.repository.update_user(jwt_data.user_id, updated_user)
