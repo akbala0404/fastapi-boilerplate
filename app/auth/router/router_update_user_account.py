@@ -19,8 +19,10 @@ def update_user_data(
     data: UpdateUserDataRequest,
     jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
-) -> None:
-    user = svc.repository.get_user_by_id(jwt_data.user_id)
+):
+    user_id = jwt_data.user_id
+
+    user = svc.repository.get_user_by_id(user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -33,4 +35,5 @@ def update_user_data(
         "city": data.city,
     }
 
-    svc.repository.update_user(jwt_data.user_id, updated_user)
+    svc.repository.update_user(user_id, updated_user)
+    return {"message": "ok"}
