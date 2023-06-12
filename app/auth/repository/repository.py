@@ -41,3 +41,8 @@ class AuthRepository:
             {"$set": updated_data}
         )
         return result.modified_count > 0
+    
+    def create_listing(self, listing_data: dict) -> str:
+        listing_data["created_at"] = datetime.utcnow()
+        result = self.database["listings"].insert_one(listing_data)
+        return str(result.inserted_id)
