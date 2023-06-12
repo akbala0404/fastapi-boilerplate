@@ -1,7 +1,7 @@
-# from typing import Any
+from typing import Any
 
 # from fastapi import Depends
-# from pydantic import Field
+from pydantic import Field
 
 # from app.utils import AppModel
 
@@ -32,7 +32,7 @@ from .dependencies import parse_jwt_user_data
 
 
 class GetMyAccountResponse(AppModel):
-    _id: str
+    id: Any = Field(alias="_id")
     email: str
     phone: str
     name: str
