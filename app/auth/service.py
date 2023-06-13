@@ -18,19 +18,16 @@ config = AuthConfig()
 class Service:
     def __init__(
         self,
-        auth_repository: AuthRepository,
-        listing_repository: ListingRepository,
-        jwt_service: JwtService,
+        repository: AuthRepository,
+        jwt_svc: JwtService,
     ):
-        self.auth_repository = auth_repository
-        self.listing_repository = listing_repository
-        self.jwt_service = jwt_service
+        self.repository = repository
+        self.jwt_svc = jwt_svc
 
 
 def get_service():
-    auth_repository = AuthRepository(database)
-    listing_repository = ListingRepository(database)
-    jwt_service = JwtService(config.JWT_ALG, config.JWT_SECRET, config.JWT_EXP)
+    repository = AuthRepository(database)
+    jwt_svc = JwtService(config.JWT_ALG, config.JWT_SECRET, config.JWT_EXP)
 
-    service = Service(auth_repository, listing_repository, jwt_service)
-    return service
+    svc = Service(repository, jwt_svc)
+    return svc
