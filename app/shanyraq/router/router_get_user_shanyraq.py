@@ -19,13 +19,13 @@ class GetSnanyraqResponse(AppModel):
     user_id: Any
 
 
-@router.get("/{shanyrak_id:str}", response_model=GetSnanyraqResponse)
+@router.get("/{shanyraq_id:str}", response_model=GetSnanyraqResponse)
 def get_shanyraq(
     shanyraq_id: str,
     jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
 ) -> dict[str, str]:
-    shanyraq = svc.repository.get_shanyrak(shanyraq_id)
+    shanyraq = svc.repository.get_shanyraq(shanyraq_id)
     if shanyraq is None:
         return Response(status_code=404)
     return GetSnanyraqResponse(**shanyraq)
