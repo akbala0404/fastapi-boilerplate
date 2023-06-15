@@ -1,5 +1,5 @@
 
-from typing import Any
+from typing import Any, List
 from bson.objectid import ObjectId
 from pymongo.database import Database
 from pymongo.results import DeleteResult, UpdateResult
@@ -31,4 +31,10 @@ class ShanyraqRepository:
     def delete_shanyraq(self, shanyraq_id: str, user_id: str) -> DeleteResult:
         return self.database["shanyraq"].delete_one(
             {"_id": ObjectId(shanyraq_id), "user_id": ObjectId(user_id)}
+        )
+    
+    def add_images_to_shanyraq(self, shanyraq_id: str, image_urls: List[str]):
+        self.database["shanyraq"].update_one(
+            {"_id": ObjectId(shanyraq_id)},
+            {"$push": {"media": image_urls}}
         )
