@@ -33,8 +33,16 @@ class ShanyraqRepository:
             {"_id": ObjectId(shanyraq_id), "user_id": ObjectId(user_id)}
         )
     
-    def add_images_to_shanyraq(self, shanyraq_id: str, image_urls: List[str]):
+    def add_images_to_shanyraq(self, shanyraq_id: str, user_id: str, 
+                               image_urls: List[str]):
         self.database["shanyraq"].update_one(
-            {"_id": ObjectId(shanyraq_id)},
-            {"$push": {"media": image_urls}}
+            {"_id": ObjectId(shanyraq_id), "user_id": ObjectId(user_id)},
+            {"$push": {"media": {"$each": image_urls}}}
+        )
+
+    def delete_media_from_shanyraq(
+            self, shanyraq_id: str, user_id: str) -> UpdateResult:
+        return self.database["shanyraq"].update_one(
+            {"_id": ObjectId(shanyraq_id), "user_id": ObjectId(user_id)},
+            {"$unset": {"media": ""}}
         )
