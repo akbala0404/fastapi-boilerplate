@@ -46,3 +46,4 @@ class ShanyraqRepository:
             {"_id": ObjectId(shanyraq_id), "user_id": ObjectId(user_id)},
             {"$unset": {"media": ""}}
         )
+    

@@ -29,5 +29,13 @@ def create_shanyraq(
     jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
 ) -> dict[str, str]:
-    shanyraq_id = svc.repository.create_shanyraq(jwt_data.user_id, input.dict())
+    coordinates = svc.get_coordinates(input.address)
+    latitude = coordinates["lat"]
+    longitude = coordinates["lng"]
+    data = input.dict()
+    data["location"] = {
+        "latitude": latitude,
+        "longitude": longitude
+    }
+    shanyraq_id = svc.repository.create_shanyraq(jwt_data.user_id, data)
     return CreateSnanyraqResponse(id=shanyraq_id)
