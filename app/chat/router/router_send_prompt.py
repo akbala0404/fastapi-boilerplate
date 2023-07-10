@@ -41,14 +41,14 @@ def chat_to_createGame(
     svc: Service = Depends(get_service),
 ) -> ChatResponse:
     prompt = request.prompt
-    if "create a game" in prompt.lower():
-        response = ("Sure! Please provide more details about the game you would like to create. To generate personalized creative play ideas for your child, please provide the following details:\n\n"
-                    "Child's Age:\n"
-                    "Child's Interests or Hobbies:\n"
-                    "Developmental Stage or Milestones:\n"
-                    "Duration or Time Available for Play:\n"
-                    "Preferred Indoor or Outdoor Activities:\n"
-                    "Any Specific Themes or Topics of Interest:")
+    if "Придумай игру" in prompt.lower():
+        response = ("Конечно! Пожалуйста, предоставьте более подробные сведения о игре, которую вы хотели бы создать. Чтобы сгенерировать персонализированные творческие игровые идеи для вашего ребенка, предоставьте следующие сведения:\n\n"
+                    "Возраст ребенка:\n"
+                    "Интересы или увлечения ребенка:\n"
+                    "Стадия развития или вехи в развитии:\n"
+                    "Длительность или доступное время для игры:\n"
+                    "Предпочитаемые внутренние или наружные занятия:\n"
+                    "Любые конкретные темы или интересы:")
 
         content_text = response
     else:
