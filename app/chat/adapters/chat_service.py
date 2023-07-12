@@ -81,7 +81,7 @@ class ChatService:
                 # {"role": "system", "content": "- Желаемый урок или смысл, который вы хотели бы, чтобы сказка несла"},
                 # {"role": "user", "content": "Мой ребенок 6 лет. Его любимый персонаж - Мишка. Он обожает мультфильм 'В поисках Немо'. Хобби у него - рисование. Хотелось бы сказку про приключения под водой, с уроком о важности дружбы и смыслом, что каждый может найти свое место в мире."},
             ],
-            max_tokens=3500,  # Specify the maximum number of tokens in the response
+            max_tokens=3000,  # Specify the maximum number of tokens in the response
             temperature=0.9  # Specify the temperature for controlling the randomness of the output
         )
         return completion.choices[0].message 
