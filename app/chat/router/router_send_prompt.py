@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Depends, status
-from app.utils import AppModel
+from app.utils import AppModel, BaseModel
 from pydantic import Field
 from typing import Any
 from ..service import Service, get_service
 from . import router
 import json
+import logging
+import string
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class ChatRequest(AppModel):
@@ -21,10 +25,10 @@ class FairytaleRequest(AppModel):
     description: str
     moralOfStory: str
 
-class FairytaleResponse(AppModel):
-    title: str
+class FairytaleResponse(BaseModel):
+    titleOfTheFairyTale: str
     readingTime: str
-    content: str
+    contentOfTheFairyTale: str
 
 @router.post("/", response_model=ChatResponse)
 def chat_with_ai(
@@ -114,30 +118,64 @@ def chat_to_createFairytale(
         content_text = response["content"] 
     return ChatResponse(response=content_text)
 
-@router.post("/createFairtale2", response_model=FairytaleResponse)
+# @router.post("/createFairtale2", response_model=FairytaleResponse)
+# def chat_to_createFairytale2(
+#     request: FairytaleRequest,
+#     svc: Service = Depends(get_service),
+# ) -> FairytaleResponse:
+#     prompt = f"Пожалуйста, создайте сказку для ребенка {request.childAge} лет, {request.childGenger}. " \
+#              f"Сказка должна быть продолжительностью {request.storyLength}. " \
+#              f"Главным героем должен быть {request.description} по имени {request.mainCharacter}. " \
+#              f"Мораль истории должна заключаться в том, чтобы {request.moralOfStory}."
+#     systemPromt = ("")
+#     response = svc.chat_service.get_fairytale(prompt, systemPromt)
+#     content_text = response["content"] 
+#     # data = response["content"] 
+    # content_text = json.dumps(content_text, ensure_ascii=False)
+#     # data = {
+#     #     "titleOfTheFairyTale": "Паучий урок",
+#     #     "readingTime": "15 минут",
+#     #     "contentOfTheFairyTale": "Жил-был великий город, где жили много разных героев. \n\n Каждый день Питер выходил на улицу и вел борьбу с преступниками, спасая горожан от опасности."
+#     # }
+#     # content_text = json.dumps(data, ensure_ascii=False)
+#     # inner_json = json.loads(content_text)  # Parse the inner JSON
+#     # fairy_tale = FairytaleResponse(**inner_json)  # Use the inner JSON to create the FairytaleResponse object
+#     # Parse the JSON data to a Python dictionary
+#     data_dict = json.loads(content_text)
+    
+#     # Create the FairytaleResponse object directly using the data
+#     fairy_tale = FairytaleResponse(data_dict)
+#     return fairy_tale
+#     # return ChatResponse(response=content_text)
+@router.post("/createFairtale2", response_model=ChatResponse)
 def chat_to_createFairytale2(
     request: FairytaleRequest,
     svc: Service = Depends(get_service),
-) -> FairytaleResponse:
+) -> ChatResponse:
     prompt = f"Пожалуйста, создайте сказку для ребенка {request.childAge} лет, {request.childGenger}. " \
              f"Сказка должна быть продолжительностью {request.storyLength}. " \
              f"Главным героем должен быть {request.description} по имени {request.mainCharacter}. " \
              f"Мораль истории должна заключаться в том, чтобы {request.moralOfStory}."
-    # prompt = f"Давайте создадим удивительную сказку для ребенка {request.childAge} лет, {request.childGenger}. " \
-    #          f"Эта увлекательная история должна длиться примерно {request.storyLength}. " \
-    #          f"Главным героем станет {request.description} по имени {request.mainCharacter}, маленький исследователь и храбрец. " \
-    #          f"Путешествуя вместе с ним, ребенок отправится в захватывающее путешествие через волшебные миры и неизведанные земли." \
-    #          f"Но какая же сказка без волшебства и загадок? В каждом уголке мира герою предстоит преодолеть испытания и разгадать тайны." \
-    #          f"Возможно, на его пути появятся новые друзья и интересные союзники, которые помогут ему в сложных ситуациях." \
-    #          f"Светлый и темный магии переплетутся в этой удивительной истории, но главное – не забыть, что настоящая сила находится внутри каждого." \
-    #          f"И какой бы путь ни проложил герой, главная мораль этой сказки заключается в том, чтобы {request.moralOfStory}." \
-    #          f"Пусть ваш ребенок с удовольствием погрузится в этот мир волшебства и приключений и черпает вдохновение из каждой страницы этой уникальной истории!"
     systemPromt = ("")
+    
+    # # Use the modified get_fairytale function with function calling
     response = svc.chat_service.get_fairytale(prompt, systemPromt)
-    content_text = response["content"] 
-    fairy_tale = FairytaleResponse(**json.loads(content_text))
-    return fairy_tale
-    # return ChatResponse(response=content_text)
+    content_text = response["content"]
+    # logger = logging.getLogger(__name__)
+
+    # # Parse the JSON data to a Python dictionary
+    # # data_dict = json.loads(content_text)
+    # logger.debug(content_text)
+    # fairy_tale = decode_fairytale_response(content_text)
+
+    # return fairy_tale
+    # print(data_dict)
+    # Create the FairytaleResponse object directly using the data
+    # fairy_tale = FairytaleResponse(**data_dict)
+    return ChatResponse(response=content_text)
+    # Use the modified get_fairytale function with function calling
+    # return fairy_tale_response
+
 
 @router.post("/explainTermsToChild", response_model=ChatResponse)
 def chat_to_explainTermsToChild(
@@ -158,3 +196,23 @@ def chat_to_explainTermsToChild(
         content_text = response["content"] 
     return ChatResponse(response=content_text)
 
+def decode_fairytale_response(content_text: str) -> FairytaleResponse:
+    # Parse the JSON data to a Python dictionary
+    data_dict = json.loads(content_text)
+
+    # Extract the required fields from the data_dict
+    titleOfTheFairyTale = data_dict.get("titleOfTheFairyTale", "")
+    readingTime = data_dict.get("readingTime", "")
+    contentOfTheFairyTale = data_dict.get("contentOfTheFairyTale", "")
+
+    # Create a new dictionary with the extracted fields
+    response_dict = {
+        "titleOfTheFairyTale": titleOfTheFairyTale,
+        "readingTime": readingTime,
+        "contentOfTheFairyTale": contentOfTheFairyTale
+    }
+
+    # Create the FairytaleResponse object directly using the data
+    fairytale_response = FairytaleResponse(**response_dict)
+
+    return fairytale_response

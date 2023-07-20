@@ -56,7 +56,8 @@ class ChatService:
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": '{title: Title Of the fairytale, readingTime: str, content: Content of the fairytale}'},
+                {"role": "system", "content": ' Your response should be in JSON: {"titleOfTheFairyTale": "string", "readingTime": "string", "contentOfTheFairyTale": "string"}'},
+                # {"role": "system", "content": '{"titleOfTheFairyTale": "string", "readingTime": "string", "contentOfTheFairyTale": "string"}'},
                 # {"role": "system", "content": "Вы - помощник для создания сказок для детей. Ваши сказки будут основываться на характеристиках ребенка, его любимых персонажах, мультфильмах, хобби и увлечениях."},
                 # {"role": "system", "content": "Пожалуйста, отвечайте вежливо и тактично."},
                 # {"role": "system", "content": "Убедитесь, что ваши ответы подходят для различных ситуаций воспитания и культурных особенностей."},
@@ -64,14 +65,14 @@ class ChatService:
                 # {"role": "system", "content": 'Пожалуйста, сгенерируйте подробный сюжет для сказки, предоставив полную и последовательную историю.\n\n'
                 #                               'Включите все необходимые элементы, такие как персонажи, места, конфликты и разрешения.\n\n'
                 #                               'Обеспечьте ясность и понятность сюжета, чтобы история развивалась гладко и увлекательно.'},                          
-                {"role": "system", "content": systemPromt},
+                # {"role": "system", "content": systemPromt},
                 {"role": "user", "content": prompt}
                
             ],
             max_tokens=3000,  # Specify the maximum number of tokens in the response
             temperature=0.9  # Specify the temperature for controlling the randomness of the output
         )
-        return completion.choices[0].message 
+        return completion.choices[0].message
 
     def get_explainToChild(self, prompt, systemPromt=None):
         completion = openai.ChatCompletion.create(
