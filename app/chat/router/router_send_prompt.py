@@ -7,8 +7,14 @@ from . import router
 import json
 import logging
 import string
+import ast
+# from langchain.document_loaders import TextLoader
+# from langchain.indexes import VectorstoreIndexCreator
 
 logging.basicConfig(level=logging.DEBUG)
+
+# loader = TextLoader('FairytaleInstructions.txt')
+# index = VectorstoreIndexCreator().from_loaders([loader])
 
 
 class ChatRequest(AppModel):
@@ -147,35 +153,30 @@ def chat_to_createFairytale(
 #     fairy_tale = FairytaleResponse(data_dict)
 #     return fairy_tale
 #     # return ChatResponse(response=content_text)
-@router.post("/createFairtale2", response_model=ChatResponse)
+@router.post("/createFairtale2", response_model=FairytaleResponse)
 def chat_to_createFairytale2(
     request: FairytaleRequest,
     svc: Service = Depends(get_service),
-) -> ChatResponse:
+) -> FairytaleResponse:
     prompt = f"Пожалуйста, создайте сказку для ребенка {request.childAge} лет, {request.childGenger}. " \
              f"Сказка должна быть продолжительностью {request.storyLength}. " \
              f"Главным героем должен быть {request.description} по имени {request.mainCharacter}. " \
              f"Мораль истории должна заключаться в том, чтобы {request.moralOfStory}."
-    systemPromt = ("")
-    
-    # # Use the modified get_fairytale function with function calling
+    systemPromt = '''
+    {
+    "titleOfTheFairyTale": "string",
+    "readingTime": "string",
+    "contentOfTheFairyTale": "string"
+    }
+    '''
     response = svc.chat_service.get_fairytale(prompt, systemPromt)
     content_text = response["content"]
-    # logger = logging.getLogger(__name__)
+    # content_text = "{\n    \"titleOfTheFairyTale\": \"Человек-паук и его мечта\",\n    \"readingTime\": \"20 минут\",\n    \"contentOfTheFairyTale\": \"\\n\\nЖил-был в маленьком городке юный мальчик по имени Питер\"\n}"
+    data_dict = json.loads(content_text)
+    fairy_tale = FairytaleResponse(**data_dict)
+    # return ChatResponse(response=content_text)
 
-    # # Parse the JSON data to a Python dictionary
-    # # data_dict = json.loads(content_text)
-    # logger.debug(content_text)
-    # fairy_tale = decode_fairytale_response(content_text)
-
-    # return fairy_tale
-    # print(data_dict)
-    # Create the FairytaleResponse object directly using the data
-    # fairy_tale = FairytaleResponse(**data_dict)
-    return ChatResponse(response=content_text)
-    # Use the modified get_fairytale function with function calling
-    # return fairy_tale_response
-
+    return fairy_tale
 
 @router.post("/explainTermsToChild", response_model=ChatResponse)
 def chat_to_explainTermsToChild(
