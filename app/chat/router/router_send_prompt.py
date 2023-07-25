@@ -41,6 +41,22 @@ class ChildVocabRequest(AppModel):
     childGenger: str
     term: str
 
+class GameDevRequest(AppModel):
+    childAge: str
+    childGenger: str
+    hobbi: str
+    gameFormat: str
+    result: str
+    place: str
+
+class GameDevResponse(BaseModel):
+    titleOfGame: str
+    timeSpending: str
+    ageLimit: str
+    memberCount: str
+    benefitsForChild: str
+    description: str
+    instructions: str
 
 @router.post("/", response_model=ChatResponse)
 def chat_with_ai(
@@ -64,30 +80,51 @@ def chat_with_ai(
     return ChatResponse(response=content_text)
 
 
-@router.post("/createGame", response_model=ChatResponse)
+@router.post("/createGame", response_model=GameDevResponse)
 def chat_to_createGame(
-    request: ChatRequest,
+    request: GameDevRequest,
     svc: Service = Depends(get_service),
-) -> ChatResponse:
-    prompt = request.prompt
-    if "/game" in prompt.lower():
-        newPromt = ("Cоздай игру для моего ребенка")
-        systemPromt = ("Учитывай возраст ребенка при генерации игр. Это очень важно."
-                       "При разработке игры учитывайте следующие аспекты, предоставленные родителем:"
-                       "- Возраст и стадия развития ребенка"
-                       "- Интересы и увлечения ребенка"
-                       "Желание родителя: проводить больше времени вместе или ограничить время на телефоне/компьютере"
-                       "- Предпочитаемый формат игры (например, настольная игра, активность на улице, цифровая игра)"
-                       "- Желаемые образовательные результаты или навыки для развития"
-                       "- Возможность игры в разных средах (например, дома, в парке, во время путешествия)"
-                       "Используя эту информацию, предложите концепцию игры, соответствующую требованиям родителя и приятную для ребенка. Не стесняйтесь запрашивать дополнительные детали или спецификации при необходимости.")
-        response = svc.chat_service.get_game(newPromt, systemPromt)
-        content_text = response["content"]
-    else:
-        systemPromt = ("")
-        response = svc.chat_service.get_game(prompt, systemPromt)
-        content_text = response["content"] 
-    return ChatResponse(response=content_text)
+) -> GameDevResponse:
+    # prompt = request.prompt
+    prompt = f"Я- родитель, и хочу придумать игры для моего ребенка: {request.childAge}, {request.childGenger}" \
+             f"Ребенок увлекается {request.hobbi}" \
+             f"Я ищу {request.gameFormat} игру, которая увлечет моего ребенка и поможет ему усвоить навыки {request.result}." \
+             f"Игра будет проходить {request.place}." \
+             f"response in JSON format"  \
+    
+    # if "/game" in prompt.lower():
+    #     newPromt = ("Cоздай игру для моего ребенка")
+    #     systemPromt = ("Учитывай возраст ребенка при генерации игр. Это очень важно."
+    #                    "При разработке игры учитывайте следующие аспекты, предоставленные родителем:"
+    #                    "- Возраст и стадия развития ребенка"
+    #                    "- Интересы и увлечения ребенка"
+    #                    "Желание родителя: проводить больше времени вместе или ограничить время на телефоне/компьютере"
+    #                    "- Предпочитаемый формат игры (например, настольная игра, активность на улице, цифровая игра)"
+    #                    "- Желаемые образовательные результаты или навыки для развития"
+    #                    "- Возможность игры в разных средах (например, дома, в парке, во время путешествия)"
+    #                    "Используя эту информацию, предложите концепцию игры, соответствующую требованиям родителя и приятную для ребенка. Не стесняйтесь запрашивать дополнительные детали или спецификации при необходимости.")
+    #     response = svc.chat_service.get_game(newPromt, systemPromt)
+    #     content_text = response["content"]
+    # else:
+    systemPromt = '''
+    {
+    "titleOfGame": "string",
+    "timeSpending": "string",
+    "ageLimit": "string",
+    "memberCount": "int",
+    "benefitsForChild": "string",
+    "description": "string",
+    "instructions": "string",
+    }
+    '''
+    response = svc.chat_service.get_game(prompt, systemPromt)
+    content_text = response["content"] 
+
+    # content_text = "{\n    \"titleOfTheFairyTale\": \"Человек-паук и его мечта\",\n    \"readingTime\": \"20 минут\",\n    \"contentOfTheFairyTale\": \"\\n\\nЖил-был в маленьком городке юный мальчик по имени Питер\"\n}"
+    data_dict = json.loads(content_text)
+    game = GameDevResponse(**data_dict)
+    return game
+    # return ChatResponse(response=content_text)
 
 
 @router.post("/createFairtale", response_model=ChatResponse)
