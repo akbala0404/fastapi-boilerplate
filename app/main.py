@@ -23,5 +23,5 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
-app.include_router(shanyraq_router, prefix="/shanyraq", tags=["Shanyraq"])
+app.include_router(shanyraq_router, prefix="/content", tags=["MainContent"])
 app.include_router(chat_router, prefix="/chat", tags=["Chat"])
