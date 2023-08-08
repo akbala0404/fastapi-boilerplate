@@ -164,3 +164,15 @@ def chat_to_explainTermsToChild(
     response = svc.chat_service.get_explainToChild(prompt, systemPromt)
     content_text = response["content"]
     return ChatResponse(response=content_text)
+
+@router.post("/explainTermsToParent", response_model=ChatResponse)
+def chat_to_explainTermsToParent(
+    request: ChatRequest,
+    svc: Service = Depends(get_service),
+) -> ChatResponse:
+    prompt = prompt = f"Объясни, что такое означает подростковый сленг {request.prompt}, родителю."
+    systemPromt = ("")
+    response = svc.chat_service.get_explainToChild(prompt, systemPromt)
+    content_text = response["content"]
+    return ChatResponse(response=content_text)
+
